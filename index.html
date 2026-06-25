@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ImagineAI – AI Image Generator</title>
+  <meta name="description" content="Turn your words into art. ImagineAI generates original images from text prompts using free AI models, right in your browser." />
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Google Fonts: Sora (display) + Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============ NAVBAR ============ -->
+  <header class="navbar" id="navbar">
+    <div class="navbar__inner container">
+      <a href="#home" class="navbar__brand">
+        <span class="navbar__logo"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+        ImagineAI
+      </a>
+
+      <nav class="navbar__links" id="navLinks">
+        <a href="#generate">Generate</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#favorites">Favorites</a>
+        <a href="#tips">Prompt Tips</a>
+        <a href="#about">About</a>
+      </nav>
+
+      <div class="navbar__actions">
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button class="icon-btn navbar__burger" id="navBurger" aria-label="Open menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERO SECTION ============ -->
+    <section class="hero" id="home">
+      <div class="container hero__inner">
+        <div class="hero__copy">
+          <p class="eyebrow"><i class="fa-solid fa-sparkles"></i> Free &middot; No sign-up &middot; Instant</p>
+          <h1 class="hero__title">
+            Type a thought.<br />
+            Watch it become <span class="text-gradient">art.</span>
+          </h1>
+          <p class="hero__subtitle">
+            ImagineAI turns plain text into original images using AI — perfect for students, teachers,
+            artists, marketers, or anyone who's ever said "I wish I could just see this idea."
+          </p>
+          <div class="hero__cta">
+            <a href="#generate" class="btn btn--primary btn--lg">
+              <i class="fa-solid fa-bolt"></i> Start Creating
+            </a>
+            <a href="#gallery" class="btn btn--ghost btn--lg">
+              View Gallery
+            </a>
+          </div>
+          <div class="hero__stats">
+            <div><strong id="statGenerated">0</strong><span>Images made here</span></div>
+            <div><strong>7</strong><span>Art styles</span></div>
+            <div><strong>100%</strong><span>Free to use</span></div>
+          </div>
+        </div>
+
+        <div class="hero__visual" aria-hidden="true">
+          <div class="prompt-morph-card">
+            <div class="prompt-morph-card__bar">
+              <span class="dot dot--r"></span><span class="dot dot--y"></span><span class="dot dot--g"></span>
+            </div>
+            <div class="prompt-morph-card__type">
+              <span id="typedPrompt"></span><span class="caret">|</span>
+            </div>
+            <div class="prompt-morph-card__frame">
+              <div class="prompt-morph-card__gradient"></div>
+              <i class="fa-solid fa-image"></i>
+            </div>
+          </div>
+          <div class="floating-chip chip--1"><i class="fa-solid fa-palette"></i> Anime</div>
+          <div class="floating-chip chip--2"><i class="fa-solid fa-cube"></i> 3D Render</div>
+          <div class="floating-chip chip--3"><i class="fa-solid fa-cat"></i> Cyberpunk</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ GENERATION PANEL ============ -->
+    <section class="generate" id="generate">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Image Generator</p>
+          <h2>Describe it. We'll draw it.</h2>
+          <p class="section-head__desc">The more detail you give, the better the result. Try mentioning subject, setting, mood, and lighting.</p>
+        </div>
+
+        <div class="generate__panel card">
+
+          <label for="promptInput" class="generate__label">Your prompt</label>
+          <textarea
+            id="promptInput"
+            class="generate__textarea"
+            maxlength="500"
+            placeholder="e.g. A cozy reading nook by a rainy window, warm lamp light, watercolor style"
+          ></textarea>
+          <div class="generate__meta">
+            <span id="charCount">0 / 500</span>
+            <button class="link-btn" id="clearPrompt"><i class="fa-solid fa-eraser"></i> Clear</button>
+          </div>
+
+          <!-- Prompt suggestions -->
+          <div class="suggestions" id="suggestions">
+            <span class="suggestions__label">Try:</span>
+            <button class="chip" data-prompt="A majestic lion wearing a crown, sitting on a throne, cinematic lighting">Lion King vibes</button>
+            <button class="chip" data-prompt="A futuristic city skyline at sunset with flying cars">Futuristic city</button>
+            <button class="chip" data-prompt="A cute robot watering plants in a sunny garden">Cute robot gardener</button>
+            <button class="chip" data-prompt="An astronaut floating peacefully above Earth, stars around">Astronaut dream</button>
+          </div>
+
+          <!-- Style Selector -->
+          <div class="style-section">
+            <span class="generate__label">Choose a style</span>
+            <div class="style-grid" id="styleGrid">
+              <button class="style-card is-active" data-style="" data-suffix="">
+                <i class="fa-solid fa-circle-half-stroke"></i><span>None</span>
+              </button>
+              <button class="style-card" data-style="realistic" data-suffix=", photorealistic, highly detailed, realistic lighting, 8k">
+                <i class="fa-solid fa-camera-retro"></i><span>Realistic</span>
+              </button>
+              <button class="style-card" data-style="anime" data-suffix=", anime style, vibrant colors, studio anime artwork">
+                <i class="fa-solid fa-dragon"></i><span>Anime</span>
+              </button>
+              <button class="style-card" data-style="fantasy" data-suffix=", fantasy art, magical, epic, intricate detail">
+                <i class="fa-solid fa-hat-wizard"></i><span>Fantasy</span>
+              </button>
+              <button class="style-card" data-style="cartoon" data-suffix=", cartoon style, playful, bold outlines, flat colors">
+                <i class="fa-solid fa-face-laugh-beam"></i><span>Cartoon</span>
+              </button>
+              <button class="style-card" data-style="digital-art" data-suffix=", digital art, trending on artstation, concept art">
+                <i class="fa-solid fa-pen-nib"></i><span>Digital Art</span>
+              </button>
+              <button class="style-card" data-style="3d-render" data-suffix=", 3D render, octane render, cinema4d, soft shadows">
+                <i class="fa-solid fa-cube"></i><span>3D Render</span>
+              </button>
+              <button class="style-card" data-style="cyberpunk" data-suffix=", cyberpunk style, neon lights, futuristic, rain, glow">
+                <i class="fa-solid fa-city"></i><span>Cyberpunk</span>
+              </button>
+            </div>
+          </div>
+
+          <button class="btn btn--primary btn--full btn--lg" id="generateBtn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Image
+          </button>
+
+          <!-- Loading state -->
+          <div class="loading-box" id="loadingBox" hidden>
+            <div class="loading-box__spinner"></div>
+            <p id="loadingText">Warming up the AI canvas…</p>
+            <div class="loading-box__bar"><span></span></div>
+          </div>
+
+          <!-- Error message -->
+          <div class="error-box" id="errorBox" hidden>
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span id="errorText"></span>
+            <button class="icon-btn" id="dismissError" aria-label="Dismiss error"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+
+          <!-- Result -->
+          <div class="result-box" id="resultBox" hidden>
+            <img id="resultImage" alt="Generated AI image" />
+            <div class="result-box__actions">
+              <button class="btn btn--secondary btn--sm" id="downloadResult"><i class="fa-solid fa-download"></i> Download</button>
+              <button class="btn btn--secondary btn--sm" id="favoriteResult"><i class="fa-regular fa-heart"></i> Favorite</button>
+              <button class="btn btn--ghost btn--sm" id="viewFullResult"><i class="fa-solid fa-expand"></i> Full View</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prompt History -->
+        <div class="history" id="history">
+          <div class="history__head">
+            <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Prompts</h3>
+            <button class="link-btn" id="clearHistory">Clear all</button>
+          </div>
+          <div class="history__list" id="historyList">
+            <p class="empty-hint" id="historyEmpty">Your recent prompts will show up here so you can reuse them anytime.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ GALLERY ============ -->
+    <section class="gallery" id="gallery">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Your Creations</p>
+          <h2>Image Gallery</h2>
+          <p class="section-head__desc">Everything you generate is saved right here in your browser.</p>
+        </div>
+        <div class="gallery__grid" id="galleryGrid">
+          <p class="empty-hint" id="galleryEmpty">No images yet — generate your first masterpiece above! ✨</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FAVORITES ============ -->
+    <section class="favorites" id="favorites">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Saved For You</p>
+          <h2><i class="fa-solid fa-heart"></i> Favorites</h2>
+          <p class="section-head__desc">Heart any image to pin it here.</p>
+        </div>
+        <div class="gallery__grid" id="favoritesGrid">
+          <p class="empty-hint" id="favoritesEmpty">No favorites yet. Tap the heart on any image to save it.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROMPT TIPS ============ -->
+    <section class="tips" id="tips">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Get Better Results</p>
+          <h2>Prompt Writing Tips</h2>
+          <p class="section-head__desc">A few small tweaks make a huge difference in image quality.</p>
+        </div>
+        <div class="tips__grid">
+          <div class="tip-card card">
+            <i class="fa-solid fa-bullseye"></i>
+            <h3>Be specific</h3>
+            <p>Instead of "a dog," try "a golden retriever puppy playing in autumn leaves."</p>
+          </div>
+          <div class="tip-card card">
+            <i class="fa-solid fa-sun"></i>
+            <h3>Mention lighting</h3>
+            <p>Words like "golden hour," "neon glow," or "soft morning light" shape the mood instantly.</p>
+          </div>
+          <div class="tip-card card">
+            <i class="fa-solid fa-camera"></i>
+            <h3>Add a shot type</h3>
+            <p>"Close-up portrait," "wide landscape shot," or "aerial view" guide composition.</p>
+          </div>
+          <div class="tip-card card">
+            <i class="fa-solid fa-palette"></i>
+            <h3>Pick an art style</h3>
+            <p>Use the style buttons above, or describe one yourself: "oil painting," "pixel art," "ink sketch."</p>
+          </div>
+          <div class="tip-card card">
+            <i class="fa-solid fa-layer-group"></i>
+            <h3>Layer your details</h3>
+            <p>Subject → setting → mood → style works well: "a fox, in a snowy forest, peaceful, watercolor."</p>
+          </div>
+          <div class="tip-card card">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            <h3>Iterate, don't settle</h3>
+            <p>Didn't love the result? Tweak a few words and regenerate — small changes = different outputs.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT ============ -->
+    <section class="about" id="about">
+      <div class="container about__inner">
+        <div class="about__copy">
+          <p class="eyebrow">How It Works</p>
+          <h2>AI image generation, explained simply</h2>
+          <p>
+            Behind the scenes, ImagineAI sends your words to an AI model trained on millions of image–text pairs.
+            That model has learned the relationships between language and visuals — so when you say
+            "a cat astronaut," it knows what a cat looks like, what a space suit looks like, and how to blend the two.
+          </p>
+          <p>
+            It then builds the image gradually, starting from random visual "noise" and refining it step by step
+            until it matches your description — a bit like a sculptor slowly revealing a shape from a block of marble.
+          </p>
+          <ul class="about__list">
+            <li><i class="fa-solid fa-check"></i> No artistic skill needed — your words are the brush.</li>
+            <li><i class="fa-solid fa-check"></i> Every image is generated fresh, just for your prompt.</li>
+            <li><i class="fa-solid fa-check"></i> Powered by the Pollinations AI Image Generation API.</li>
+          </ul>
+        </div>
+        <div class="about__visual" aria-hidden="true">
+          <div class="about__step">
+            <span class="about__step-num">1</span>
+            <p>You write a prompt</p>
+          </div>
+          <i class="fa-solid fa-arrow-down about__arrow"></i>
+          <div class="about__step">
+            <span class="about__step-num">2</span>
+            <p>AI model interprets it</p>
+          </div>
+          <i class="fa-solid fa-arrow-down about__arrow"></i>
+          <div class="about__step">
+            <span class="about__step-num">3</span>
+            <p>Image is rendered &amp; refined</p>
+          </div>
+          <i class="fa-solid fa-arrow-down about__arrow"></i>
+          <div class="about__step">
+            <span class="about__step-num">4</span>
+            <p>Your artwork appears ✨</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+ <!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="container footer__inner">
+    <div class="footer__brand">
+      <a href="#home" class="navbar__brand">
+        <span class="navbar__logo"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+        ImagineAI
+      </a>
+      <p>Turning words into art, one prompt at a time.</p>
+      <div class="footer__info">
+    <p><i class="fa-solid fa-code"></i> HTML • CSS • JavaScript</p>
+    <p><i class="fa-solid fa-robot"></i> Powered by Pollinations AI</p>
+</div>
+    </div>
+
+    <div class="footer__col">
+      <h4>Explore</h4>
+      <a href="#generate">Generate</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#favorites">Favorites</a>
+      <a href="#tips">Prompt Tips</a>
+    </div>
+
+    <div class="footer__col">
+  <h4>Resources</h4>
+  <a href="https://pollinations.ai/" target="_blank" rel="noopener">Pollinations AI</a>
+  <a href="https://github.com/pollinations/pollinations" target="_blank" rel="noopener">API Documentation</a>
+  <a href="#about">How It Works</a>
+</div>
+  </div>
+
+  <div class="footer__bottom container">
+    <p>&copy; <span id="year"></span> ImagineAI. Built with curiosity, caffeine, and a bit of magic.</p>
+    <p>Made with <i class="fa-solid fa-heart"></i> using HTML, CSS &amp; JavaScript</p>
+  </div>
+</footer>
+
+<!-- ============ FULLSCREEN LIGHTBOX ============ -->
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lightbox__close" id="lightboxClose" aria-label="Close">&times;</button>
+  <img id="lightboxImage" alt="Full screen preview" />
+  <div class="lightbox__caption" id="lightboxCaption"></div>
+</div>
+
+<!-- ============ TOAST ============ -->
+<div class="toast" id="toast"></div>
+
+<script src="script.js" defer></script>
+</body>
+</html>
